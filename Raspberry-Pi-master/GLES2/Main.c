@@ -1,4 +1,4 @@
-#include <stdbool.h>			// Neede for bool
+#include <stdbool.h>			// Needed for bool
 #include <stdint.h>				// Needed for uint32_t, uint16_t etc
 #include <string.h>				// Needed for memcpy
 #include "emb-stdio.h"			// Needed for printf
