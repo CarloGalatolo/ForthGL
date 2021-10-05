@@ -331,7 +331,6 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		scene->vertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
 		uint8_t* p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->vertexVC4);
 		uint8_t* q = p;
-		scene->tcp = *p;
 
 		/* Setup triangle vertices from OpenGL tutorial which used this */
 		// fTriangle[0] = -0.4f; fTriangle[1] = 0.1f; fTriangle[2] = 0.0f;

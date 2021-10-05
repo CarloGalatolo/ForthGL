@@ -94,8 +94,6 @@ typedef struct render_t
 	VC4_ADDR binningDataVC4;					// Binning data VC4 locked address
 	VC4_ADDR binningCfgEnd;						// VC4 binning config end address
 
-	uint8_t tcp;
-
 } RENDER_STRUCT;
 
 /***************************************************************************}

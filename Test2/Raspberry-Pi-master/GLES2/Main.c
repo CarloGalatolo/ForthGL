@@ -1,12 +1,12 @@
-#include <stdbool.h>			// Neede for bool
+#include <stdbool.h>			// Needed for bool
 #include <stdint.h>				// Needed for uint32_t, uint16_t etc
 #include <string.h>				// Needed for memcpy
 #include "emb-stdio.h"			// Needed for printf
 #include "rpi-smartstart.h"		// Needed for smart start API 
 #include "rpi-GLES.h"
 
-// be865b13
-// be865000
+#define ALIGN_128BIT_MASK  0xFFFFFF80
+
 
 static uint32_t shader1[18] = {  // Vertex Color Shader
 		0x958e0dbf, 0xd1724823,   /* mov r0, vary; mov r3.8d, 1.0 */
@@ -41,9 +41,13 @@ int main (void) {
 	// Step1: Initialize scene
 	V3D_InitializeScene(&scene, GetConsole_Width(), GetConsole_Height());
 
-	uint32_t supertmp = scene.loadpos;
-	uint32_t tmp = (scene.loadpos + 127) & 0xFFFFFF80;
-
+	if (&scene) 
+	{
+		scene.vertexVC4 = (scene.loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
+		uint8_t* p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene.vertexVC4);
+		uint8_t* q = p;
+	}
+/*
 	// Step2: Add vertexes to scene
 	V3D_AddVertexesToScene(&scene);
 
@@ -60,9 +64,6 @@ int main (void) {
 	V3D_RenderScene(&scene);
 
 	printf("All done batman .. we have triangles\n");
-	printf("Indirizzo di scene prima di V3D_AddVertexesToScene %x\n", scene.loadpos);
-	printf("Inidirizzo di scene dopo le operazioni con la maschera %x\n", tmp);
-	printf("Inidirizz tradotto da GPU ad ARM %x\n", scene.tcp);
 
 	while (1){
 		set_Activity_LED(1);			// Turn LED on
@@ -74,5 +75,7 @@ int main (void) {
 	// Release resources
 	//V3D_mem_unlock(handle);
 	//V3D_mem_free(handle);
+
+	*/
 	return(0);
 }
