@@ -328,9 +328,14 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 {
 	if (scene) 
 	{
+		scene->loadpos_copy = scene->loadpos;
+
+
 		scene->vertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
+		scene->tmp[0] = scene->vertexVC4;
 		uint8_t* p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->vertexVC4);
 		uint8_t* q = p;
+		scene->tcp[0] = p;
 
 		/* Setup triangle vertices from OpenGL tutorial which used this */
 		// fTriangle[0] = -0.4f; fTriangle[1] = 0.1f; fTriangle[2] = 0.0f;
@@ -348,9 +353,12 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_uint16_t(&p, (centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
 		emit_float(&p, 1.0f);											// Z
 		emit_float(&p, 1.0f);											// 1/W
-		emit_float(&p, 1.0f);											// Varying 0 (Red)
-		emit_float(&p, 0.0f);											// Varying 1 (Green)
-		emit_float(&p, 0.0f);											// Varying 2 (Blue)
+	//	emit_float(&p, 1.0f);											// Varying 0 (Blue)
+		emit_uint32_t(&p, 0x3f800000);	// 0x3f800000 = 1.0f
+	//	emit_float(&p, 0.0f);											// Varying 1 (Green)
+		emit_uint32_t(&p, 0);
+	//	emit_float(&p, 0.0f);											// Varying 2 (Red)
+		emit_uint32_t(&p, 0x3f800000);
 
 		// Vertex: bottom left, vary blue
 		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
@@ -418,8 +426,10 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		scene->loadpos = scene->vertexVC4 + (p - q);					// Update load position
 
 		scene->indexVertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold index vertex start adderss .. align it to 128 bits
+		scene->tmp[1] = scene->indexVertexVC4;
 		p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->indexVertexVC4);
 		q = p;
+		scene->tcp[1] = p;
 
 		emit_uint8_t(&p, 0);											// tri - top
 		emit_uint8_t(&p, 1);											// tri - bottom left
@@ -447,8 +457,10 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 	if (scene)
 	{
 		scene->shaderStart = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold shader start adderss .. aligned to 127 bits
+		scene->tmp[2] = scene->shaderStart;
 		uint8_t *p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->shaderStart);	// ARM address for load
 		uint8_t *q = p;												// Hold start address
+		scene->tcp[2] = p;
 
 		for (int i = 0; i < frag_shader_emits; i++)					// For the number of fragment shader emits
 			emit_uint32_t(&p, frag_shader[i]);						// Emit fragment shader into our allocated memory
@@ -456,8 +468,10 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 		scene->loadpos = scene->shaderStart + (p - q);				// Update load position
 
 		scene->fragShaderRecStart = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold frag shader start adderss .. .aligned to 128bits
+		scene->tmp[3] = scene->fragShaderRecStart;
 		p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->fragShaderRecStart);
 		q = p;
+		scene->tcp[3] = p;
 
 		// Okay now we need Shader Record to buffer
 		emit_uint8_t(&p, 0x01);										// flags

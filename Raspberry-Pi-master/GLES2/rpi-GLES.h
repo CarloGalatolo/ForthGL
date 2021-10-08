@@ -94,6 +94,11 @@ typedef struct render_t
 	VC4_ADDR binningDataVC4;					// Binning data VC4 locked address
 	VC4_ADDR binningCfgEnd;						// VC4 binning config end address
 
+	uint8_t* tcp[5];
+	uint32_t tmp[5];
+	VC4_ADDR loadpos_copy;
+	uint8_t* dummy[7];
+
 } RENDER_STRUCT;
 
 /***************************************************************************}
@@ -148,6 +153,7 @@ bool V3D_execute_qpu (int32_t num_qpus, uint32_t control, uint32_t noflush, uint
 
 
 bool V3D_InitializeScene (RENDER_STRUCT* scene, uint32_t renderWth, uint32_t renderHt);
+// bool V3D_AddVertexesToScene (RENDER_STRUCT* scene);
 bool V3D_AddVertexesToScene (RENDER_STRUCT* scene);
 bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_t frag_shader_emits);
 bool V3D_SetupRenderControl(RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr);

@@ -391,11 +391,15 @@ bool CoreExecute (uint8_t coreNum, void (*func) (void) );
 
 /*-[ARMaddrToGPUaddr]-------------------------------------------------------}
 . Converts an ARM address to GPU address by using the GPU_alias offset
+.
+.		OR con C0000000
 .--------------------------------------------------------------------------*/
 uint32_t ARMaddrToGPUaddr (void* ARMaddress);
 
 /*-[GPUaddrToARMaddr]-------------------------------------------------------}
 . Converts a GPU address to an ARM address by using the GPU_alias offset
+.
+. 		AND con 3FFFFFFF
 .--------------------------------------------------------------------------*/
 uint32_t GPUaddrToARMaddr (uint32_t GPUaddress);
 
