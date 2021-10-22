@@ -17,7 +17,7 @@ CREATE ARRAYTMP
 					e1800001 , 	\ orr	r0, r0, r1
 					BX_LR , 	\ bx	lr
 					0000ef34 , 	\ .word	0000ef34
-	ARRAYTMP JSR
+	DROP \ARRAYTMP JSR
 ;
 
 \ Converte un indirizzo a 32 bit dal formato GPU al formato ARM.
@@ -30,8 +30,8 @@ CREATE ARRAYTMP
 					e1c00001 , 	\ bic	r0, r0, r1
 					BX_LR , 	\ bx	lr
 					0000ef34 , 	\ .word	0000ef34
-	ARRAYTMP JSR
+	DROP \ARRAYTMP JSR
 ;
 
 \
-CREATE ARRAYTMP	E51F0004 , A6A6A6A6 , e59f1008 , e5911000 , e1800001 , e12fff1e , 0000ef34 , 
+\CREATE ARRAYTMP	E51F0004 , A6A6A6A6 , e59f1008 , e5911000 , e1800001 , e12fff1e , 0000ef34 , 
