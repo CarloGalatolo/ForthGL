@@ -7,6 +7,17 @@ HEX
 
 3F800000 constant f1.0 \ 1.0 Float number
 
+: EMIT  P @ ! P @ 4 + P ! ; \ Emit word on memory position P
+
+: SET_LOADPOS   RENDL @ 7f + ffffff80 AND ; \ scene->vertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
+
+: UPDATE_LOADPOS   P @ Q @ - SET_LOADPOS + RENDL ! ;
+
+\ scene->tmp[0] = scene->vertexVC4;
+\ uint8_t* p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->vertexVC4);
+\ uint8_t* q = p;
+: SETPQ  GPU2ARM DUP P ! DUP Q ! ;
+
 SET_LOADPOS
 SETPQ
 
