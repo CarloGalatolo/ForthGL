@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "wchar.h": "c",
+        "wctype.h": "c"
+    }
+}

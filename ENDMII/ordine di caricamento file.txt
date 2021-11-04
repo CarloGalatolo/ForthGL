@@ -1,6 +1,0 @@
-Complete
-AddPoint
-AddShade
-setuprender
-Bin_Fine
-ENDOFALL

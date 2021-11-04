@@ -5,6 +5,12 @@
 #include "rpi-smartstart.h"		// Needed for smart start API 
 #include "rpi-GLES.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <wchar.h> 
+#include <wctype.h> 
+
 #define v3d ((volatile __attribute__((aligned(4))) uint32_t*)(uintptr_t)(RPi_IO_Base_Addr + 0xc00000))
 
 // be865b13
@@ -34,6 +40,21 @@ static uint32_t shader2[12] = { // Fill Color Shader
 static RENDER_STRUCT scene = { 0 };
 
 int main (void) {
+
+	//FILE *ptr;
+	//ptr = fopen("test.bin","wb");
+	//if(!ptr){
+
+	
+	//FILE *v3d_init_file;
+	//v3d_init_file = open("./v3d_init_file.txt","w");
+
+ /* if (!v3d_init_file) // equivalent to saying if ( in_file == NULL ) 
+             {  
+                printf("oops, file can't be read\n"); 
+           
+             } 
+			 else{*/
 	Init_EmbStdio(Embedded_Console_WriteChar);						// Initialize embedded stdio
 	PiConsole_Init(1280, 720, 32, printf);							// Auto resolution console, message to screen
 	displaySmartStart(printf);										// Display smart start details
@@ -42,8 +63,6 @@ int main (void) {
 
 	// Step1: Initialize scene
 	V3D_InitializeScene(&scene, GetConsole_Width(), GetConsole_Height());
-
-
 
 	// Step2: Add vertexes to scene
 	V3D_AddVertexesToScene(&scene);
@@ -57,8 +76,9 @@ int main (void) {
 	// Step5: Setup binning
 	V3D_SetupBinningConfig(&scene);
 
+	printf("Render DAta VC4:%x \n",scene.rendererDataVC4);
     // Step 6: Render the scene
-	V3D_RenderScene(&scene);
+	//V3D_RenderScene(&scene);
 
 	printf("All done batman .. we have triangles\n");
 	//printf("RPi_IO_base_address: %x\n", v3d);
@@ -82,8 +102,8 @@ int main (void) {
 	}
 	*/
 	//printf("scene->binningDataVC4: %x\nscene->binningCfgEnd: %x\nscene->renderControlVC4: %x\nscene->renderControlEndVC4: %x\n", (uint8_t)*(scene.dummy[0]), (uint8_t)*(scene.dummy[1]), (uint8_t)*(scene.dummy[2]), (uint8_t)*(scene.dummy[3]));
-	printf("scene->tileDataBufferVC4 = %x\nscene->tileDataBufferVC4 + (y * scene->binWth + x) * 32 = %x\nOffset = %x\n", scene.banana[0], scene.banana[1], scene.banana[1] - scene.banana[0]);
-
+	//printf("scene->tileDataBufferVC4 = %x\nscene->tileDataBufferVC4 + (y * scene->binWth + x) * 32 = %x\nOffset = %x\n", scene.banana[0], scene.banana[1], scene.banana[1] - scene.banana[0]);
+	
 	while (1){
 		set_Activity_LED(1);			// Turn LED on
 		timer_wait(500000);	// 0.5 sec delay

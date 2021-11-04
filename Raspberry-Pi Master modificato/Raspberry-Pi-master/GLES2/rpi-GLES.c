@@ -300,27 +300,73 @@ static void emit_float(uint8_t **list, float f) {
 }
 
 
+void printMemory (uint8_t* p, uint8_t* q) {
+	printf("P: %X\tQ: %X\tP-Q: %X", p,q,p-q);
+
+	for(int i = 0; i != (p-q); i++){
+		if( i % 4 == 0 ){
+			printf("\nAddr: %X, values: ", q+i);
+		}
+		printf("%2X ",*(q+i));
+	}
+	
+	printf("\n");
+}
+
+void printMemoryLong (uint8_t* p, uint8_t* q) {
+	printf("P: %X\tQ: %X\tP-Q: %X", p,q,p-q);
+
+	for(int i = 0; i != 480; i++){
+		if (i % 16 == 0)
+		{
+			printf("\n");
+		}
+
+		if( i % 4 == 0 ){
+			printf("\tAddr: %X, valz:", q+i);
+		}
+		printf(" %2X",*(q+i));
+	}
+	
+	printf("\n");
+}
+
+
 bool V3D_InitializeScene (RENDER_STRUCT* scene, uint32_t renderWth, uint32_t renderHt )
 {
 	if (scene) 
 	{
 		scene->rendererHandle = V3D_mem_alloc(0x10000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
 		if (!scene->rendererHandle) return false;
+
 		scene->rendererDataVC4 = V3D_mem_lock(scene->rendererHandle);
+	//	fprintf(v3d_init_file,"Render DAta VC4:%d \n",scene->rendererDataVC4);
+
 		scene->loadpos = scene->rendererDataVC4;					// VC4 load from start of memory
-
+	//	fprintf(v3d_init_file,"Render Loadpos:%d \n",scene->loadpos);
 		scene->renderWth = renderWth;								// Render width
+		//fprintf(v3d_init_file,"Render width:%d \n",scene->renderWth);
 		scene->renderHt = renderHt;									// Render height
+		//fprintf(v3d_init_file,"Render Height:%d \n",scene->renderHt);
 		scene->binWth = (renderWth + 63) / 64;						// Tiles across 
+		//fprintf(v3d_init_file,"bin tiles across:%d \n",scene->binWth);
 		scene->binHt = (renderHt + 63) / 64;						// Tiles down 
+		//fprintf(v3d_init_file,"bin tiles down:%d \n",scene->binHt);
 
-		scene->tileMemSize = 0x4000;
+		scene->tileMemSize = 0x4002;
+	//	fprintf(v3d_init_file,"Tiles size:%d \n",scene->tileMemSize);
 		scene->tileHandle = V3D_mem_alloc(scene->tileMemSize + 0x4000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
+	//	fprintf(v3d_init_file,"Tiles handle:%d \n",scene->tileHandle);
 		scene->tileStateDataVC4 = V3D_mem_lock(scene->tileHandle);
+	//	fprintf(v3d_init_file,"Tiles DAta vc4:%d \n",scene->tileStateDataVC4);
 		scene->tileDataBufferVC4 = scene->tileStateDataVC4 + 0x4000;
+	//	fprintf(v3d_init_file,"Tiles data buffer:%d \n",scene->tileDataBufferVC4);
 
 		scene->binningHandle = V3D_mem_alloc(0x10000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
+	//	fprintf(v3d_init_file,"binning handle:%d \n",scene->binningHandle);
 		scene->binningDataVC4 = V3D_mem_lock(scene->binningHandle);
+	//	fprintf(v3d_init_file,"binning data vc4:%d \n",scene->binningDataVC4);
+		//fclose(v3d_init_file);
 		return true;
 	}
 	return false;
@@ -361,10 +407,14 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_uint8_t(&p, 0x80);
 		emit_uint8_t(&p, 0x3f);
 
+		//16
+
 	//	emit_float(&p, 0.0f);											// Varying 1 (Green)
 		emit_uint32_t(&p, 0);
 	//	emit_float(&p, 0.0f);											// Varying 2 (Red)
 		emit_uint32_t(&p, 0x3f800000);
+
+		//24
 
 		// Vertex: bottom left, vary blue
 		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
@@ -375,6 +425,8 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_float(&p, 0.0f);											// Varying 1 (Green)
 		emit_float(&p, 1.0f);											// Varying 2 (Blue)
 
+		//48
+
 		// Vertex: bottom right, vary green 
 		emit_uint16_t(&p, (centreX + half_shape_wth) << 4);				// X in 12.4 fixed point
 		emit_uint16_t(&p, (centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
@@ -384,51 +436,11 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_float(&p, 1.0f);											// Varying 1 (Green)
 		emit_float(&p, 0.0f);											// Varying 2 (Blue)
 
+		//72
 
-		/* Setup triangle vertices from OpenGL tutorial which used this */
-		// fQuad[0] = -0.2f; fQuad[1] = -0.1f; fQuad[2] = 0.0f;
-		// fQuad[3] = -0.2f; fQuad[4] = -0.6f; fQuad[5] = 0.0f;
-		// fQuad[6] = 0.2f; fQuad[7] = -0.1f; fQuad[8] = 0.0f;
-		// fQuad[9] = 0.2f; fQuad[10] = -0.6f; fQuad[11] = 0.0f;
-		centreY = (uint_fast32_t)(1.35f * (scene->renderHt / 2));				// quad centre y
+		//printMemory(p, q);
 
-		// Vertex: Top, left  vary blue
-		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
-		emit_float(&p, 1.0f);											// Z
-		emit_float(&p, 1.0f);											// 1/W
-		emit_float(&p, 0.0f);											// Varying 0 (Red)
-		emit_float(&p, 0.0f);											// Varying 1 (Green)
-		emit_float(&p, 1.0f);											// Varying 2 (Blue)
-
-		// Vertex: bottom left, vary Green
-		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
-		emit_float(&p, 1.0f);											// Z
-		emit_float(&p, 1.0f);											// 1/W
-		emit_float(&p, 0.0f);											// Varying 0 (Red)
-		emit_float(&p, 1.0f);											// Varying 1 (Green)
-		emit_float(&p, 0.0f);											// Varying 2 (Blue)
-
-		// Vertex: top right, vary red
-		emit_uint16_t(&p, (centreX + half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
-		emit_float(&p, 1.0f);											// Z
-		emit_float(&p, 1.0f);											// 1/W
-		emit_float(&p, 1.0f);											// Varying 0 (Red)
-		emit_float(&p, 0.0f);											// Varying 1 (Green)
-		emit_float(&p, 0.0f);											// Varying 2 (Blue)
-
-		// Vertex: bottom right, vary yellow
-		emit_uint16_t(&p, (centreX + half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
-		emit_float(&p, 1.0f);											// Z
-		emit_float(&p, 1.0f);											// 1/W
-		emit_float(&p, 0.0f);											// Varying 0 (Red)
-		emit_float(&p, 1.0f);											// Varying 1 (Green)
-		emit_float(&p, 1.0f);											// Varying 2 (Blue)
-
-		scene->num_verts = 7;
+		scene->num_verts = 3;
 		scene->loadpos = scene->vertexVC4 + (p - q);					// Update load position
 
 		scene->indexVertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold index vertex start adderss .. align it to 128 bits
@@ -441,16 +453,10 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_uint8_t(&p, 1);											// tri - bottom left
 		emit_uint8_t(&p, 2);											// tri - bottom right
 
-		emit_uint8_t(&p, 3);											// quad - top left
-		emit_uint8_t(&p, 4);											// quad - bottom left
-		emit_uint8_t(&p, 5);											// quad - top right
+		//printMemory(p,q);
 
-		emit_uint8_t(&p, 4);											// quad - bottom left
-		emit_uint8_t(&p, 6);											// quad - bottom right
-		emit_uint8_t(&p, 5);											// quad - top right
-		scene->IndexVertexCt = 9;
-		scene->MaxIndexVertex = 6;
-
+		scene->IndexVertexCt = 3;	// Emitted vertexes
+		scene->MaxIndexVertex = 2;	// Max index value
 		scene->loadpos = scene->indexVertexVC4 + (p - q);				// Move loaad pos to new position
 		return true;
 	}
@@ -473,6 +479,8 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 
 		scene->loadpos = scene->shaderStart + (p - q);				// Update load position
 
+		// printMemory(p,q);
+
 		scene->fragShaderRecStart = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold frag shader start adderss .. .aligned to 128bits
 		scene->tmp[3] = scene->fragShaderRecStart;
 		p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->fragShaderRecStart);
@@ -490,6 +498,8 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 
 		scene->loadpos = scene->fragShaderRecStart + (p - q);		// Adjust VC4 load poistion
 
+		// printMemory(p,q);
+
 		return true;
 	}
 	return false;
@@ -505,31 +515,12 @@ bool V3D_SetupRenderControl (RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr)
 		uint8_t *q = p;													// Hold start address
 
 		// Clear colors
-		/* emit_uint8_t(&p, GL_CLEAR_COLORS);
+		emit_uint8_t(&p, GL_CLEAR_COLORS);
 		emit_uint32_t(&p, 0xff000000);								// Opaque Black
 		emit_uint32_t(&p, 0xff000000);								// 32 bit clear colours need to be repeated twice
 		emit_uint32_t(&p, 0);
 		emit_uint8_t(&p, 0);
-		*/
-		emit_uint32_t(&p, 0x00000072);
-		emit_uint32_t(&p, 0x000000ff);
-		emit_uint32_t(&p, 0x000000ff);
-		emit_uint16_t(&p, 0);
-		/*emit_uint8_t(&p, 0x72);
-
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 0xff);
-
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 00);
-		emit_uint8_t(&p, 0xff);
-
-		emit_uint32_t(&p, 0);
-		emit_uint8_t(&p, 0);
-		*/
+		
 		// Tile Rendering Mode Configuration
 		emit_uint8_t(&p, GL_TILE_RENDER_CONFIG);
 
@@ -554,6 +545,11 @@ bool V3D_SetupRenderControl (RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr)
 		emit_uint8_t(&p, GL_STORE_TILE_BUFFER);
 		emit_uint16_t(&p, 0);										// Store nothing (just clear)
 		emit_uint32_t(&p, 0);										// no address is needed
+
+		printf("scene->binWth: %d\tscene->binHt: %d\n", scene->binWth, scene->binHt);
+
+		//printf("Prima del for\n");
+		//printMemory(p,q);
 
 		// Link all binned lists together
 		for (int x = 0; x < scene->binWth; x++) {
@@ -584,6 +580,15 @@ bool V3D_SetupRenderControl (RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr)
 
 		scene->loadpos = scene->renderControlVC4 + (p - q);			// Adjust VC4 load poistion
 		scene->renderControlEndVC4 = scene->loadpos;				// Hold end of render control data
+
+		//printf("Dopo il for\n");
+		//printMemoryLong(p,q+0x24);
+
+		//printf("Più avanti nel for\n");
+		//printMemoryLong(p, q+480);
+
+		printf("Fine del for\n");
+		printMemoryLong(p, q+1920);
 
 		return true;
 	}

@@ -28,7 +28,8 @@ extern "C" {									// Put extern C directive wrapper around
 #include <stdbool.h>							// Needed for bool and true/false
 #include <stdint.h>								// Needed for uint8_t, uint32_t, etc
 #include "rpi-smartstart.h"						// Need for mailbox
-
+#include <stdio.h>
+#include <stdlib.h>		
 /*--------------------------------------------------------------------------}
 ;{		  ENUMERATED GPU MEMORY ALLOCATE FLAGS FROM REFERENCE			  	}
 ;{--------------------------------------------------------------------------}
@@ -162,6 +163,9 @@ bool V3D_SetupRenderControl(RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr);
 bool V3D_SetupBinningConfig (RENDER_STRUCT* scene);
 
 void V3D_RenderScene (RENDER_STRUCT* scene);
+
+void printMemory (uint8_t* p, uint8_t* q);
+void printMemoryLong (uint8_t* p, uint8_t* q);
 
 #ifdef __cplusplus								// If we are including to a C++ file
 }												// Close the extern C directive wrapper
