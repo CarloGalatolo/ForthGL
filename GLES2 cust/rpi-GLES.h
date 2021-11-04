@@ -164,6 +164,9 @@ bool V3D_SetupBinningConfig (RENDER_STRUCT* scene);
 
 void V3D_RenderScene (RENDER_STRUCT* scene);
 
+void printMemory (uint8_t* p, uint8_t* q);
+void printMemoryLong (uint8_t* p, uint8_t* q);
+
 #ifdef __cplusplus								// If we are including to a C++ file
 }												// Close the extern C directive wrapper
 #endif
