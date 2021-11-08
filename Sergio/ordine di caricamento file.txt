@@ -1,6 +1,6 @@
 Complete
 AddPoint
 AddShade
-setuprender
+setuprender2
 Bin_Fine
 ENDOFALL

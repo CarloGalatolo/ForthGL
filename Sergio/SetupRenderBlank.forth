@@ -17,7 +17,7 @@ variable Q \Q
 
 \ (uint32 -- )
 \ Emit word on memory position P
-: EMITWORD  P @ ! P @ 4 + P ! ; 
+: EMIT  P @ ! P @ 4 + P ! ; 
 
 \ (? -- ?)
 \ scene->vertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
@@ -34,9 +34,9 @@ variable Q \Q
 SET_LOADPOS DUP RENDCONT ! 
 SETPQ
 
-72000000 EMITWORD
-ff000000 EMITWORD
-ff000000 EMITWORD
-0000 EMITWORD
+72000000 EMIT
+ff000000 EMIT
+ff000000 EMIT
+0000 EMIT
 
 P @ Q @ - SHADER @ + DUP RENDL ! ENDREND !
