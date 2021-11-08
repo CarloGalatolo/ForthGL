@@ -99,7 +99,9 @@ typedef struct render_t
 	uint32_t tmp[5];
 	VC4_ADDR loadpos_copy;
 	VC4_ADDR banana[2];
-	//uint32_t* dummy[6];
+	uint32_t* dummy[40];
+	int wrap;
+	int counter;
 	//static auto RPi_IO_base = ((volatile __attribute__((aligned(4))) uint32_t*)(uintptr_t)(RPi_IO_Base_Addr + 0xc00000)) - 0xC00000;
 
 } RENDER_STRUCT;
@@ -166,6 +168,7 @@ void V3D_RenderScene (RENDER_STRUCT* scene);
 
 void printMemory (uint8_t* p, uint8_t* q);
 void printMemoryLong (uint8_t* p, uint8_t* q);
+bool lammerda();
 
 #ifdef __cplusplus								// If we are including to a C++ file
 }												// Close the extern C directive wrapper

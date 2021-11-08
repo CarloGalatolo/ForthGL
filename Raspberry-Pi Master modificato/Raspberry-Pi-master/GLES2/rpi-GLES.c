@@ -331,42 +331,56 @@ void printMemoryLong (uint8_t* p, uint8_t* q) {
 	printf("\n");
 }
 
+bool lammerda (RENDER_STRUCT* scene, int i)
+{
+	scene->dummy[i] = v3d[V3D_CT0CS];
+	i = (i+1) % 40;
+	if (i % 40 == 0)
+	{
+		scene->wrap++;
+	}
+	scene->counter++;
+
+	return true;
+}
+
 
 bool V3D_InitializeScene (RENDER_STRUCT* scene, uint32_t renderWth, uint32_t renderHt )
 {
 	if (scene) 
 	{
 		scene->rendererHandle = V3D_mem_alloc(0x10000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
+		//printf("scene->rendererHandle:\t%X \n", scene->rendererHandle);
 		if (!scene->rendererHandle) return false;
 
 		scene->rendererDataVC4 = V3D_mem_lock(scene->rendererHandle);
-	//	fprintf(v3d_init_file,"Render DAta VC4:%d \n",scene->rendererDataVC4);
+		//printf("Render DAta VC4:%X \n",scene->rendererDataVC4);
 
 		scene->loadpos = scene->rendererDataVC4;					// VC4 load from start of memory
-	//	fprintf(v3d_init_file,"Render Loadpos:%d \n",scene->loadpos);
+		//printf("Render Loadpos:%X \n",scene->loadpos);
 		scene->renderWth = renderWth;								// Render width
-		//fprintf(v3d_init_file,"Render width:%d \n",scene->renderWth);
+		//printf("Render width:%X \n",scene->renderWth);
 		scene->renderHt = renderHt;									// Render height
-		//fprintf(v3d_init_file,"Render Height:%d \n",scene->renderHt);
+		//printf("Render Height:%X \n",scene->renderHt);
 		scene->binWth = (renderWth + 63) / 64;						// Tiles across 
-		//fprintf(v3d_init_file,"bin tiles across:%d \n",scene->binWth);
+		//printf("bin tiles across:%X \n",scene->binWth);
 		scene->binHt = (renderHt + 63) / 64;						// Tiles down 
-		//fprintf(v3d_init_file,"bin tiles down:%d \n",scene->binHt);
+		//printf("bin tiles down:%X \n",scene->binHt);
 
 		scene->tileMemSize = 0x4002;
-	//	fprintf(v3d_init_file,"Tiles size:%d \n",scene->tileMemSize);
+		//printf("Tiles size:%X \n",scene->tileMemSize);
 		scene->tileHandle = V3D_mem_alloc(scene->tileMemSize + 0x4000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
-	//	fprintf(v3d_init_file,"Tiles handle:%d \n",scene->tileHandle);
+		//printf("Tiles handle:%X \n",scene->tileHandle);
 		scene->tileStateDataVC4 = V3D_mem_lock(scene->tileHandle);
-	//	fprintf(v3d_init_file,"Tiles DAta vc4:%d \n",scene->tileStateDataVC4);
+		//printf("Tiles DAta vc4:%X \n",scene->tileStateDataVC4);
 		scene->tileDataBufferVC4 = scene->tileStateDataVC4 + 0x4000;
-	//	fprintf(v3d_init_file,"Tiles data buffer:%d \n",scene->tileDataBufferVC4);
+		//printf("Tiles data buffer:%X \n",scene->tileDataBufferVC4);
 
 		scene->binningHandle = V3D_mem_alloc(0x10000, 0x1000, MEM_FLAG_COHERENT | MEM_FLAG_ZERO);
-	//	fprintf(v3d_init_file,"binning handle:%d \n",scene->binningHandle);
+		//printf("binning handle:%X \n",scene->binningHandle);
 		scene->binningDataVC4 = V3D_mem_lock(scene->binningHandle);
-	//	fprintf(v3d_init_file,"binning data vc4:%d \n",scene->binningDataVC4);
-		//fclose(v3d_init_file);
+		//printf("binning data vc4:%X \n",scene->binningDataVC4);
+
 		return true;
 	}
 	return false;
@@ -396,16 +410,16 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		// Vertex Data
 
 		// Vertex: Top, vary red
-		emit_uint16_t(&p, 100); //(centreX) << 4);								// X in 12.4 fixed point
-		emit_uint16_t(&p, 100); //(centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
+		emit_uint16_t(&p, 0); //(centreX) << 4);								// X in 12.4 fixed point
+		emit_uint16_t(&p, 0); //(centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
 		emit_float(&p, 1.0f);											// Z
 		emit_float(&p, 1.0f);											// 1/W
-	//	emit_float(&p, 1.0f);											// Varying 0 (Blue)
+		emit_float(&p, 1.0f);											// Varying 0 (Blue)
 	//	emit_uint32_t(&p, 0x3f800000);	// 0x3f800000 = 1.0f
-		emit_uint8_t(&p, 0x0);
-		emit_uint8_t(&p, 0x0);
-		emit_uint8_t(&p, 0x80);
-		emit_uint8_t(&p, 0x3f);
+	//	emit_uint8_t(&p, 0x0);
+	//	emit_uint8_t(&p, 0x0);
+	//	emit_uint8_t(&p, 0x80);
+	//	emit_uint8_t(&p, 0x3f);
 
 		//16
 
@@ -417,8 +431,8 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		//24
 
 		// Vertex: bottom left, vary blue
-		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
+		emit_uint16_t(&p, 0x200);//(centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
+		emit_uint16_t(&p, 0);//(centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
 		emit_float(&p, 1.0f);											// Z
 		emit_float(&p, 1.0f);											// 1/W
 		emit_float(&p, 0.0f);											// Varying 0 (Red)
@@ -428,8 +442,8 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		//48
 
 		// Vertex: bottom right, vary green 
-		emit_uint16_t(&p, (centreX + half_shape_wth) << 4);				// X in 12.4 fixed point
-		emit_uint16_t(&p, (centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
+		emit_uint16_t(&p, 0x200);//(centreY + half_shape_ht) << 4);				// Y in 12.4 fixed point
+		emit_uint16_t(&p, 0x200);//(centreX + half_shape_wth) << 4);				// X in 12.4 fixed point
 		emit_float(&p, 1.0f);											// Z
 		emit_float(&p, 1.0f);											// 1/W
 		emit_float(&p, 0.0f);											// Varying 0 (Red)
@@ -479,7 +493,7 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 
 		scene->loadpos = scene->shaderStart + (p - q);				// Update load position
 
-		// printMemory(p,q);
+		//printMemory(p,q);
 
 		scene->fragShaderRecStart = (scene->loadpos + 127) & ALIGN_128BIT_MASK;// Hold frag shader start adderss .. .aligned to 128bits
 		scene->tmp[3] = scene->fragShaderRecStart;
@@ -498,7 +512,7 @@ bool V3D_AddShadderToScene (RENDER_STRUCT* scene, uint32_t* frag_shader, uint32_
 
 		scene->loadpos = scene->fragShaderRecStart + (p - q);		// Adjust VC4 load poistion
 
-		// printMemory(p,q);
+		//printMemory(p,q);
 
 		return true;
 	}
@@ -546,7 +560,7 @@ bool V3D_SetupRenderControl (RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr)
 		emit_uint16_t(&p, 0);										// Store nothing (just clear)
 		emit_uint32_t(&p, 0);										// no address is needed
 
-		printf("scene->binWth: %d\tscene->binHt: %d\n", scene->binWth, scene->binHt);
+		//printf("scene->binWth: %d\tscene->binHt: %d\n", scene->binWth, scene->binHt);
 
 		//printf("Prima del for\n");
 		//printMemory(p,q);
@@ -587,8 +601,8 @@ bool V3D_SetupRenderControl (RENDER_STRUCT* scene, VC4_ADDR renderBufferAddr)
 		//printf("Più avanti nel for\n");
 		//printMemoryLong(p, q+480);
 
-		printf("Fine del for\n");
-		printMemoryLong(p, q+1920);
+		//printf("Fine del for\n");
+		//printMemoryLong(p, q+1920);
 
 		return true;
 	}
@@ -602,6 +616,7 @@ bool V3D_SetupBinningConfig (RENDER_STRUCT* scene)
 	{
 		uint8_t *p = (uint8_t*)(uintptr_t)GPUaddrToARMaddr(scene->binningDataVC4); // ARM address for binning data load
 		uint8_t *list = p;												// Hold start address
+		uint8_t *q = p;
 
 		emit_uint8_t(&p, GL_TILE_BINNING_CONFIG);						// tile binning config control 
 		emit_uint32_t(&p, scene->tileDataBufferVC4);					// tile allocation memory address
@@ -658,6 +673,8 @@ bool V3D_SetupBinningConfig (RENDER_STRUCT* scene)
 		emit_uint8_t(&p, GL_HALT);
 		scene->binningCfgEnd = scene->binningDataVC4 + (p-list);		// Hold binning data end address
 
+		printMemory(p,q);
+
 		return true;
 	}
 	return false;
@@ -678,7 +695,11 @@ void V3D_RenderScene (RENDER_STRUCT* scene)
 		// stop the thread
 		v3d[V3D_CT0CS] = 0x20;
 		// wait for it to stop
-		while (v3d[V3D_CT0CS] & 0x20);
+		int i = 1;
+		scene->counter = 0;
+		scene->wrap = 0;
+		scene->dummy[0] = v3d[V3D_CT0CS];
+		while (v3d[V3D_CT0CS] & 0x20 & lammerda(scene, i)) {}		
 
 		// Run our control list
 		v3d[V3D_BFC] = 1;											// reset binning frame count
@@ -701,8 +722,5 @@ void V3D_RenderScene (RENDER_STRUCT* scene)
 
 		// wait for render to finish
 		while (v3d[V3D_RFC] == 0) {}
-
 	}
 }
-
-

@@ -76,9 +76,19 @@ int main (void) {
 	// Step5: Setup binning
 	V3D_SetupBinningConfig(&scene);
 
-	printf("Render DAta VC4:%x \n",scene.rendererDataVC4);
+	//printf("Render DAta VC4:%x \n",scene.rendererDataVC4);
     // Step 6: Render the scene
 	//V3D_RenderScene(&scene);
+
+	/*
+	for (int i = 0; i < 40; i++)
+	{
+		printf("At i=%d, v3d[V3D_CT0CS] = %X\n", i, scene.dummy[i]);
+	}
+	//printf("Wrapped %d times.\n", scene.wrap);
+	printf("Executed %d times.\n", scene.counter);
+	*/
+
 
 	printf("All done batman .. we have triangles\n");
 	//printf("RPi_IO_base_address: %x\n", v3d);
