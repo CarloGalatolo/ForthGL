@@ -353,12 +353,9 @@ bool V3D_AddVertexesToScene (RENDER_STRUCT* scene)
 		emit_uint16_t(&p, (centreY - half_shape_ht) << 4);				// Y in 12.4 fixed point
 		emit_float(&p, 1.0f);											// Z
 		emit_float(&p, 1.0f);											// 1/W
-	//	emit_float(&p, 1.0f);											// Varying 0 (Blue)
-		emit_uint32_t(&p, 0x3f800000);	// 0x3f800000 = 1.0f
-	//	emit_float(&p, 0.0f);											// Varying 1 (Green)
-		emit_uint32_t(&p, 0);
-	//	emit_float(&p, 0.0f);											// Varying 2 (Red)
-		emit_uint32_t(&p, 0x3f800000);
+		emit_float(&p, 1.0f);											// Varying 0 (Blue)
+		emit_float(&p, 0.0f);											// Varying 1 (Green)
+		emit_float(&p, 0.0f);											// Varying 2 (Red)
 
 		// Vertex: bottom left, vary blue
 		emit_uint16_t(&p, (centreX - half_shape_wth) << 4);				// X in 12.4 fixed point
