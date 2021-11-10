@@ -1,5 +1,5 @@
 
-HEX
+\HEX
 
 VARIABLE P
 VARIABLE PBUF
@@ -21,4 +21,3 @@ VARIABLE COUNTER
 
 \ (byte0 byte1 byte2 byte3 -- )
 : EMIT32   EMIT8 EMIT8 EMIT8 EMIT8 ;
-

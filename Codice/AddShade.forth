@@ -1,4 +1,5 @@
-HEX
+
+\HEX
 
 \0x958e0dbf, 0xd1724823,  \ /* mov r0, vary; mov r3.8d, 1.0 */
 \0x818e7176, 0x40024821,  \ /* fadd r0, r0, r5; mov r1, vary */
@@ -13,7 +14,7 @@ HEX
 variable SHADER \ Q
 variable RSHADER \ fragShaderRecStart record
 
-SET_LOADPOS DUP SHADER ! 
+SET_LOADPOS DUP SHADER !
 SETPQ
 
 958e0dbf RSV EMITWORD
