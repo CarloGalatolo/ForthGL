@@ -3,7 +3,7 @@ variable NVRT \number of vertex
 variable VVC4 \Vertex VC4
 variable MVC4 \Max Vertex VC4
 variable IVVC4 \index Vertex VC4
-variable P \P
+\ variable P \P
 variable Q \Q
 
 \ Converte un indirizzo a 32 bit dal formato ARM al formato GPU.
@@ -14,7 +14,7 @@ variable Q \Q
 
 \ (uint32 -- )
 \ Emit word on memory position P
-: EMIT DUP . P @ DUP . ! P @ DUP @ . 4 + P ! ; 
+\ : EMIT DUP . P @ DUP . ! P @ DUP @ . 4 + P ! ; 
 
 \ (? -- ?)
 \ scene->vertexVC4 = (scene->loadpos + 127) & ALIGN_128BIT_MASK;	// Hold vertex start adderss .. aligned to 128bits
@@ -38,35 +38,35 @@ SETPQ
 
 \RWH @ 2 / 14 lshift RHT @ 2 / 4 * A / RHT @ 2 / 3 * A / - 4 lshift OR EMIT
 
-0 EMIT \ VERTICE 1
+0 EMITWORD \ VERTICE 1
 
-3F800000 RSV EMIT
-3F800000 RSV EMIT
-3F800000 RSV EMIT
-0 EMIT
-0 EMIT
+3F 80 00 00 EMIT32
+3F 80 00 00 EMIT32
+3F 80 00 00 EMIT32
+0 EMITWORD
+0 EMITWORD
 
 \RWH @ 2 / RWH @ 2 / 4 * A / - 14 lshift
 \RHT @ 2 / 4 * A / RHT @ 2 / 3 * A / + 4 lshift
 \OR EMIT
 
-0200 RSV2 0000 RSV2 10 LSHIFT OR EMIT \ VERTICE 2
-3F800000 RSV EMIT
-3F800000 RSV EMIT
-0 EMIT
-0 EMIT
-3F800000 RSV EMIT
+02 00 00 00 EMIT32 \ VERTICE 2
+3F 80 00 00 EMIT32
+3F 80 00 00 EMIT32
+0 EMITWORD
+0 EMITWORD
+3F 80 00 00 EMIT32
 
 \ RWH @ 2 / RWH @ 2 / 4 * A / + 14 lshift
 \ RHT @ 2 / 4 * A / RHT @ 2 / 3 * A / + 4 lshift
 \ OR EMIT
 
-0200 RSV2 0200 RSV2 10 LSHIFT OR EMIT \ VERTICE 3
-3F800000 RSV EMIT
-3F800000 RSV EMIT
-0 EMIT
-3F800000 RSV EMIT
-0 EMIT
+02 00 02 00 RSV2 EMIT32 \ VERTICE 3
+3F 80 00 00 EMIT32
+3F 80 00 00 EMIT32
+0 EMITWORD
+3F 80 00 00 EMIT32
+0 EMITWORD
 
 3 NVRT !
 UPDATE_LOADPOS
@@ -74,7 +74,7 @@ UPDATE_LOADPOS
 SET_LOADPOS DUP IVVC4 !
 SETPQ
 
-2 10 lshift 1 8 lshift or EMIT
+00 02 01 00  EMIT32
 
 3 VVC4 !
 2 MVC4 !

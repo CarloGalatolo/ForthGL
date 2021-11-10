@@ -41,9 +41,11 @@ HEX
 \ Memorizza 0 in MBMP a partire da offset +begin a finire con offset +end incluso.
 : STORE0  4 + SWAP BEGIN DUP MBMP + 0 SWAP ! 4 + 2DUP = UNTIL 2DROP ;
 
-: RSV DUP FF000000 AND 18 RSHIFT SWAP DUP 00FF0000 AND 8 RSHIFT SWAP DUP 0000FF00 AND 8 LSHIFT SWAP FF AND 18 LSHIFT OR OR OR ;
+: RSV  DUP FF000000 AND 18 RSHIFT SWAP DUP 00FF0000 AND 8 RSHIFT SWAP DUP 0000FF00 AND 8 LSHIFT SWAP FF AND 18 LSHIFT OR OR OR ;
 
-: RSV2 DUP FF00 AND 8 RSHIFT SWAP FF AND 8 LSHIFT OR ;
+: RSV2  DUP FF00 AND 8 RSHIFT SWAP FF AND 8 LSHIFT OR ;
+
+: DROPMB  VMBW 20 - @ DROP ;
 \Framebuffer.f get dimension of the framebuffer
 
 60 MBMP ! 
@@ -68,6 +70,8 @@ MBMP 18 + @ RHT !
 RHT @ 3f + 40 / BHT !
 RWH @ 3f + 40 / BWH !
 
+DROPMB
+
 \end Framebuffer.f
 
 \Begin SetMaxClock.f
@@ -88,6 +92,7 @@ C MBMP C + !
 10 1C STORE0
 
 MBME VMBW !
+DROPMB
 \end SetMaxClock.f
 
 \begin initV3d.F, by setting the qpu clock rate and enabling it
@@ -111,6 +116,7 @@ EGPU MBMP 8 + !
 1 MBMP 14 + ! 
 18 20 STORE0
 mbme vmbw !
+DROPMB
 \end initv3d.f
 
 \begin tilememalloc
@@ -143,12 +149,12 @@ TILEH @ MBMP 14 + !
 MBME VMBW !
 MBMP 14 + @ DUP TILES !
 4000 + TILEB !
-
+DROPMB
 \end tilealloc.f
- vmbw 20 - dup @ . dup 14 + @ .
+\ vmbw 20 - dup @ . dup 14 + @ .
  
-dup @ . dup 14 + @ .
-dup @ . dup 14 + @ .
+\ dup @ . dup 14 + @ .
+\ dup @ . dup 14 + @ .
 
 \ps. la mailbox può saturarsi, ricordare di smontare valori leggendo il valore nell'indirizzo videocore 3f00b880, e scartando il valore con .
 
@@ -178,6 +184,7 @@ BINH @ MBMP 14 + !
 
 MBME VMBW !
 MBMP 14 + @ BIND !
+DROPMB
 \end binalloc
 
 \begin V3Dmemalloc.f , TO BE MORE SPECIFIC: THIS IS THE RENDERER HANDLER
@@ -205,5 +212,6 @@ RENDH @ MBMP 14 + !
 MBME VMBW !
 MBMP 14 + @ RENDD !
 MBMP 14 + @ RENDL !
+DROPMB
 
 \end V3dMemalloc

@@ -14,7 +14,7 @@ VARIABLE COUNTER
 \ 8 bit alla volta e shiftando se necessario.
 \ (byte -- )
 : EMIT8   COUNTER @ 0 = IF 0 OR PBUF ! ELSE PBUF @ 8 LSHIFT OR PBUF ! THEN 
-          COUNTER @ 1 + 4 MOD COUNTER ! COUNTER @ 0 = IF PBUF EMITWORD THEN ;
+          COUNTER @ 1 + 4 MOD COUNTER ! COUNTER @ 0 = IF PBUF @ EMITWORD THEN ;
 
 \ (byte0 byte1 -- )
 : EMIT16   EMIT8 EMIT8 ;
