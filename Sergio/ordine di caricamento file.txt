@@ -1,6 +1,13 @@
-Complete
+Initialize
+Framebuffer
+SetMaxClock
+InitV3D
+TileMemAlloc
+BinAlloc
+V3DMemAlloc
+Emit
 AddPoint
 AddShade
-setuprender2
+SetupRender
 Bin_Fine
-ENDOFALL
+RenderScene

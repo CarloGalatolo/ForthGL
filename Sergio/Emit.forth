@@ -8,7 +8,7 @@ VARIABLE COUNTER
 
 \ (uint32 -- )
 \ Emit word on memory position P
-: EMITWORD  P @ ! P @ 4 + P ! ; 
+: EMITWORD  DUP . P @ DUP . ! P @ DUP @ . 4 + P ! ; 
 
 \ Prende un byte in esadecimale e un counter da 0 a 3, costruisce una parola a 32 bit componendola 
 \ 8 bit alla volta e shiftando se necessario.

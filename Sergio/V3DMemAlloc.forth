@@ -1,0 +1,29 @@
+
+\begin V3Dmemalloc.f , TO BE MORE SPECIFIC: THIS IS THE RENDERER HANDLER
+30 MBMP ! 
+0 MBMP 4 + !
+AMEM MBMP 8 + ! 
+C MBMP C + ! 
+0 MBMP 10 + ! 
+10000 MBMP 14 + ! 
+1000 mbmp 18 + !
+18 1C mbmp + !
+20 30 STORE0
+
+MBME VMBW !
+MBMP 14 + @ RENDH !
+
+30 MBMP ! 
+0 MBMP 4 + !
+LMEM MBMP 8 + ! 
+4 MBMP C + ! 
+0 MBMP 10 + ! 
+RENDH @ MBMP 14 + ! 
+18 30 STORE0
+
+MBME VMBW !
+MBMP 14 + @ RENDD !
+MBMP 14 + @ RENDL !
+DROPMB
+
+\end V3dMemalloc
